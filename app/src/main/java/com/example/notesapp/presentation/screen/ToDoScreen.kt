@@ -11,6 +11,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
 
 import com.example.notesapp.presentation.components.CounterSection
 import com.example.notesapp.presentation.components.InputSection
@@ -18,7 +19,8 @@ import com.example.notesapp.presentation.components.TodoList
 import com.example.notesapp.presentation.viewmodel.TodoViewModel
 @Composable
 fun ToDoScreen(
-    viewModel: TodoViewModel = viewModel()
+    navController: NavController,
+    viewModel: TodoViewModel
 ) {
 
     Column(
@@ -49,7 +51,13 @@ fun ToDoScreen(
         Spacer(modifier = Modifier.height(16.dp))
 
         TodoList(
-            items = viewModel.todoItems
+            items = viewModel.todoItems,
+            onTodoClick = { todoId ->
+
+                navController.navigate(
+                    "detail/$todoId"
+                )
+            }
         )
     }
 }

@@ -9,10 +9,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.example.notesapp.domain.model.TodoItem
 
 @Composable
 fun TodoList(
-    items: List<String>
+    items: List<TodoItem>,
+    onTodoClick: (Int) -> Unit
 ) {
 
     if (items.isEmpty()) {
@@ -40,7 +42,8 @@ fun TodoList(
             items(items) { item ->
 
                 TodoCard(
-                    text = item
+                    todo = item,
+                    onTodoClick = onTodoClick
                 )
             }
         }

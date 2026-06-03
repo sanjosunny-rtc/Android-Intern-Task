@@ -7,11 +7,18 @@ class AddTodoUseCase(
     private val repository: TodoRepository
 ) {
 
-    operator fun invoke(title: String) {
+    operator fun invoke(
+        id: Int,
+        title: String
+    ) {
 
         if (title.isNotBlank()) {
+
             repository.addTodo(
-                TodoItem(title.trim())
+                TodoItem(
+                    id = id,
+                    title = title.trim()
+                )
             )
         }
     }
