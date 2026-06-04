@@ -3,10 +3,11 @@ package com.example.notesapp.data.repository
 import com.example.notesapp.data.local.NoteDao
 import com.example.notesapp.data.local.NoteEntity
 import com.example.notesapp.domain.repository.TodoRepository
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.withContext // <-- ADDED IMPORT
 
-// Pass the NoteDao into the constructor so the repository can use the database
-class TodoRepositoryImpl(
+class NoteRepositoryImpl(
     private val dao: NoteDao
 ) : TodoRepository {
 
@@ -15,10 +16,16 @@ class TodoRepositoryImpl(
     }
 
     override suspend fun insertNote(note: NoteEntity) {
-        dao.insert(note) // This uses the Long-returning DAO method we fixed earlier
+        // Manually move the database work to a background thread
+        withContext(Dispatchers.IO) {
+            dao.insert(note)
+        }
     }
 
     override suspend fun deleteNote(note: NoteEntity) {
-        dao.delete(note) // This uses the Int-returning DAO method we fixed earlier
+        // Manually move the database work to a background thread
+        withContext(Dispatchers.IO) {
+            dao.delete(note)
+        }
     }
 }

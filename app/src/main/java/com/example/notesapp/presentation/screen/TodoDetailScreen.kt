@@ -5,6 +5,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState // <-- ADDED IMPORT
+import androidx.compose.runtime.getValue // <-- ADDED IMPORT
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
@@ -17,8 +19,11 @@ fun TodoDetailScreen(
     navController: NavController,
     viewModel: TodoViewModel
 ) {
+    // 1. Collect the live list of notes from the database
+    val todoList by viewModel.todoItems.collectAsState()
 
-    val todo = viewModel.getTodoById(todoId)
+    // 2. Find the specific note that matches the ID passed to this screen
+    val todo = todoList.find { it.id == todoId }
 
     Scaffold(
         topBar = {
@@ -26,15 +31,12 @@ fun TodoDetailScreen(
                 title = {
                     Text("Todo Detail")
                 },
-
                 navigationIcon = {
-
                     IconButton(
                         onClick = {
                             navController.popBackStack()
                         }
                     ) {
-
                         Icon(
                             imageVector = Icons.Default.ArrowBack,
                             contentDescription = "Back"
@@ -59,6 +61,7 @@ fun TodoDetailScreen(
             Spacer(modifier = Modifier.height(16.dp))
 
             Text(
+                // NoteEntity uses 'title', so this works perfectly!
                 text = todo?.title ?: "Todo not found",
                 style = MaterialTheme.typography.bodyLarge
             )

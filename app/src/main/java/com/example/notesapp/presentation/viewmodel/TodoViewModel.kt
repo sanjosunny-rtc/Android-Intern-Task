@@ -1,26 +1,34 @@
 package com.example.notesapp.presentation.viewmodel
 
-import android.util.Log
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
-import com.example.notesapp.domain.model.TodoItem
+import androidx.lifecycle.viewModelScope
+import com.example.notesapp.data.local.NoteEntity
+import com.example.notesapp.domain.repository.TodoRepository
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 
-class TodoViewModel : ViewModel() {
+class TodoViewModel(
+    private val repository: TodoRepository
+) : ViewModel() {
 
     var count by mutableStateOf(0)
         private set
+
     var inputText by mutableStateOf("")
         private set
 
-    private var nextId = 1
 
-    private val _todoItems = mutableStateListOf<TodoItem>()
-
-    val todoItems: List<TodoItem>
-        get() = _todoItems
+    val todoItems = repository
+        .getAllNotes()
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = emptyList()
+        )
 
     fun increment() {
         count++
@@ -30,27 +38,40 @@ class TodoViewModel : ViewModel() {
         count--
     }
 
-    fun onInputChange(text: String) {
+    fun onInputChange(
+        text: String
+    ) {
         inputText = text
     }
 
     fun addTodo() {
-
         if (inputText.isBlank()) return
 
-        val todo = TodoItem(
-            id = nextId++,
-            title = inputText.trim()
-        )
-
-        _todoItems.add(todo)
-
-        Log.d("ToDoApp", "Added item: ${todo.title}")
-
-        inputText = ""
+        viewModelScope.launch {
+            repository.insertNote(
+                NoteEntity(
+                    title = inputText.trim(),
+                    body = "",
+                    timestamp = System.currentTimeMillis()
+                )
+            )
+            inputText = ""
+        }
     }
 
-    fun getTodoById(id: Int): TodoItem? {
-        return todoItems.find { it.id == id }
+    fun deleteNote(
+        note: NoteEntity
+    ) {
+        viewModelScope.launch {
+            repository.deleteNote(note)
+        }
+    }
+
+    fun restoreNote(
+        note: NoteEntity
+    ) {
+        viewModelScope.launch {
+            repository.insertNote(note)
+        }
     }
 }

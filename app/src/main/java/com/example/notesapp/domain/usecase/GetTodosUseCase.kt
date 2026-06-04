@@ -7,5 +7,5 @@ class GetTodosUseCase(
 ) {
 
     operator fun invoke() =
-        repository.getTodos()
+        repository.getAllNotes()
 }
