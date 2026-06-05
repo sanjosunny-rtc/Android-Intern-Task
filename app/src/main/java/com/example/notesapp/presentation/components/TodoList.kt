@@ -26,11 +26,27 @@ fun TodoList(
             modifier = Modifier.fillMaxWidth().padding(32.dp),
             contentAlignment = Alignment.Center
         ) {
-            Text(
-                text = "No tasks yet. Add one above!",
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+
+                Text(
+                    text = "📝",
+                    style = MaterialTheme.typography.headlineLarge
+                )
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+                Text(
+                    text = "No Notes Yet",
+                    style = MaterialTheme.typography.titleMedium
+                )
+
+                Text(
+                    text = "Add your first note to get started",
+                    style = MaterialTheme.typography.bodyMedium
+                )
+            }
         }
     } else {
         LazyColumn(

@@ -15,12 +15,11 @@ class TodoViewModel(
     private val repository: TodoRepository
 ) : ViewModel() {
 
-    var count by mutableStateOf(0)
-        private set
-
     var inputText by mutableStateOf("")
         private set
 
+    var errorMessage by mutableStateOf<String?>(null)
+        private set
 
     val todoItems = repository
         .getAllNotes()
@@ -29,14 +28,6 @@ class TodoViewModel(
             started = SharingStarted.WhileSubscribed(5000),
             initialValue = emptyList()
         )
-
-    fun increment() {
-        count++
-    }
-
-    fun decrement() {
-        count--
-    }
 
     fun onInputChange(
         text: String
@@ -47,15 +38,21 @@ class TodoViewModel(
     fun addTodo() {
         if (inputText.isBlank()) return
 
+
         viewModelScope.launch {
-            repository.insertNote(
-                NoteEntity(
-                    title = inputText.trim(),
-                    body = "",
-                    timestamp = System.currentTimeMillis()
+            try {
+                repository.insertNote(
+                    NoteEntity(
+                        title = inputText.trim(),
+                        body = "",
+                        timestamp = System.currentTimeMillis()
+                    )
                 )
-            )
-            inputText = ""
+                inputText = ""
+            } catch (e: Exception) {
+
+            errorMessage = "Database error occurred"
+        }
         }
     }
 
@@ -63,7 +60,12 @@ class TodoViewModel(
         note: NoteEntity
     ) {
         viewModelScope.launch {
+            try{
             repository.deleteNote(note)
+            } catch (e: Exception) {
+
+                errorMessage = "Database error occurred"
+            }
         }
     }
 
@@ -71,7 +73,19 @@ class TodoViewModel(
         note: NoteEntity
     ) {
         viewModelScope.launch {
+            try{
             repository.insertNote(note)
+            } catch (e: Exception) {
+
+                errorMessage = "Database error occurred"
+            }
         }
     }
+    var searchQuery by mutableStateOf("")
+        private set
+
+    fun onSearchQueryChange(query: String) {
+        searchQuery = query
+    }
+
 }

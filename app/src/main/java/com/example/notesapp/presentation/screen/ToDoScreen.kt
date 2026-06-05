@@ -1,5 +1,6 @@
 package com.example.notesapp.presentation.screen
 
+import SearchBar
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.* // <-- Make sure to import Material3 components
 import androidx.compose.runtime.*
@@ -8,23 +9,47 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import kotlinx.coroutines.launch // <-- For the Snackbar coroutine
 
-import com.example.notesapp.presentation.components.CounterSection
 import com.example.notesapp.presentation.components.InputSection
 import com.example.notesapp.presentation.components.TodoList
 import com.example.notesapp.presentation.viewmodel.TodoViewModel
+import android.widget.Toast
+import androidx.compose.ui.platform.LocalContext
 
 @Composable
 fun ToDoScreen(
     navController: NavController,
     viewModel: TodoViewModel
 ) {
+    val context = LocalContext.current
     val todoList by viewModel.todoItems.collectAsState()
 
     // 1. Create state for the Snackbar and Coroutine Scope
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
+    val filteredNotes =
+        if (viewModel.searchQuery.isBlank()) {
+            todoList
+        } else {
+            todoList.filter {
+                it.title.contains(
+                    viewModel.searchQuery,
+                    ignoreCase = true
+                )
+            }
+        }
 
-    // 2. Wrap your layout in a Scaffold to show the Snackbar at the bottom
+    LaunchedEffect(viewModel.errorMessage) {
+
+        viewModel.errorMessage?.let {
+
+            Toast.makeText(
+                context,
+                it,
+                Toast.LENGTH_SHORT
+            ).show()
+        }
+    }
+
     Scaffold(
         snackbarHost = { SnackbarHost(snackbarHostState) }
     ) { paddingValues ->
@@ -35,27 +60,30 @@ fun ToDoScreen(
                 .padding(paddingValues) // Apply Scaffold padding
                 .padding(16.dp)
         ) {
-
-            CounterSection(
-                count = viewModel.count,
-                onIncrement = viewModel::increment,
-                onDecrement = viewModel::decrement
+            Text(
+                text = "Notes",
+                style = MaterialTheme.typography.headlineMedium
             )
 
-            Spacer(modifier = Modifier.height(24.dp))
-            HorizontalDivider()
-            Spacer(modifier = Modifier.height(24.dp))
+            Spacer(modifier = Modifier.height(16.dp))
 
             InputSection(
                 text = viewModel.inputText,
                 onTextChange = viewModel::onInputChange,
                 onAdd = viewModel::addTodo
             )
+            Spacer(modifier = Modifier.height(16.dp))
+            SearchBar(
+                query = viewModel.searchQuery,
+                onQueryChange = viewModel::onSearchQueryChange
+            )
 
             Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(16.dp))
+
 
             TodoList(
-                items = todoList,
+                items = filteredNotes,
                 onTodoClick = { todoId ->
                     navController.navigate("detail/$todoId")
                 },

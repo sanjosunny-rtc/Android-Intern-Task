@@ -11,7 +11,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.example.notesapp.data.local.NoteEntity
-import com.example.notesapp.domain.model.TodoItem
 
 @Composable
 fun TodoCard(

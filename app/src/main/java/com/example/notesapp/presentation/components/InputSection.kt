@@ -26,7 +26,7 @@ fun InputSection(
             value = text,
             onValueChange = onTextChange,
             label = {
-                Text("Add a task...")
+                Text("Add a Note...")
             },
             modifier = Modifier.weight(1f),
             singleLine = true
