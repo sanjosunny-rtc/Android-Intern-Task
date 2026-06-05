@@ -1,5 +1,6 @@
 package com.example.notesapp.presentation.components
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -9,14 +10,20 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.example.notesapp.data.local.NoteEntity
 
 @Composable
 fun TodoCard(
-    text: String
+    todo: NoteEntity,
+    onTodoClick: (Int) -> Unit
 ) {
 
     Card(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable {
+                onTodoClick(todo.id)
+            },
         elevation = CardDefaults.cardElevation(
             defaultElevation = 2.dp
         )
@@ -34,7 +41,7 @@ fun TodoCard(
             )
 
             Text(
-                text = text,
+                text = todo.title,
                 style = MaterialTheme.typography.bodyLarge
             )
         }
